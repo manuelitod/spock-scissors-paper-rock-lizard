@@ -83,6 +83,9 @@ end
 class Uniforme < Estrategia
 
     def initialize(jugadas)
+        for x in (0..jugadas.length-1)
+            jugadas[x] = fromSymbolToClass(jugadas[x])
+        end
         @arreglo = jugadas
     end
 
@@ -254,6 +257,79 @@ class Copiar < Estrategia
 
 end
 
+
+class Partida
+
+    attr_accessor :s1, :s2
+
+
+    def initialize(hash)
+        raise ArgumentError, 'Argumento tiene mas o menos de dos jugador' unless hash.length==2
+
+        hash.values.each do  |jugadores|
+            if jugadores.is_a? Estrategia
+                next
+            else
+                raise ArgumentError, 'Argumento tiene cosas que no son Estrategias'
+            end
+        end
+
+        @s1 = hash.values[0]
+        @s2 = hash.values[1]
+        @jugador1 = hash.keys[0]
+        @jugador2 = hash.keys[1]
+        @rondas = 0
+        @ganadas1 = 0
+        @ganadas2 = 0
+    
+
+    end
+
+    def rondas(n)
+        if !(n.is_a? Numeric)
+            raise ArgumentError, "Argumento no es numerico"
+        end
+
+        jugada1 = Piedra.new
+        jugada2 = Piedra.new
+        for x in (0..n-1)
+            @rondas = @rondas +1
+            jugada1 = @s1.prox(jugada2)
+            jugada2 = @s2.prox(jugada1)
+            puntos = jugada1.puntos(jugada2)
+            @ganadas1 = @ganadas1 + puntos[0]
+            @ganadas2 = @ganadas2 + puntos[1]
+        end
+    end
+
+    def alcanzar(n)
+        if !(n.is_a? Numeric)
+            raise ArgumentError, "Argumento no es numerico"
+        end
+
+        jugada1 = Piedra.new
+        jugada2 = Piedra.new
+        while @ganadas1 < n and @ganadas2 < n
+            @rondas = @rondas +1
+            jugada1 = @s1.prox(jugada2)
+            jugada2 = @s2.prox(jugada1)
+            puntos = jugada1.puntos(jugada2)
+            @ganadas1 = @ganadas1 + puntos[0]
+            @ganadas2 = @ganadas2 + puntos[1]
+        end
+
+        self.info
+
+
+    end
+
+
+    def info
+        hash = { @jugador1 => @ganadas1, @jugador2 => @ganadas2, :Round => @rondas}
+        puts "#{hash}"
+    end
+
+end
 
 def hayPosibilidades(probabilidad, actual)
     for x in 0..(probabilidad.length-1)
