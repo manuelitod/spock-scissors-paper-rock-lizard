@@ -33,7 +33,7 @@ end
 
 class Papel < Jugada
 
-    @pierde = ["Lagarto", "Tijera"]
+    @pierde = ["Lagarto", "Tijeras"]
 
     def to_s
         puts "Papel"
@@ -46,7 +46,7 @@ class Tijeras < Jugada
     @pierde = ["Piedra", "Spock"]
 
     def to_s
-        puts "Tijera"
+        puts "Tijeras"
     end
 
     def pierde
@@ -56,7 +56,7 @@ end
 
 class Lagarto < Jugada
     attr_accessor   :pierde
-    @pierde = ["Piedra", "Tijera"]
+    @pierde = ["Piedra", "Tijeras"]
 
     def to_s
         puts "Lagarto"
@@ -176,10 +176,84 @@ class Sesgada < Estrategia
         return @llaves[i]
     end
 
+end
+
+class Pensar < Estrategia
+    @Papel=0
+    @Tijeras = 0
+    @Piedra = 0
+    @Spock = 0
+    @Lagarto = 0
 
 
+    def to_s
+        "Pensar"
+    end
+
+    def prox(m)
+        if m.is_a? Jugada
+            if m.class == Piedra
+                @Piedra = @Piedra + 1
+            elsif m.class == Tijeras
+                @Tijeras = @Tijeras +1
+            elsif m.class == Papel
+                @Papel = @Papel +1
+            elsif m.class == Spock
+                @Spock = @Spock +1
+            elsif m.class == Lagarto
+                @Lagarto = @Lagarto +1
+            end
+        else
+            puts "Parametro invalido. No es una jugada"
+        end
+
+        r = (@Piedra+@Tijeras+@Papel+@Spock+@Lagarto)-1
+        if r == -1
+            r = 0
+        end
+        n = Random.rand(0..r)
+        if 0 <= n and n < @Piedra
+            return Piedra.new
+        elsif @Piedra <= n and n < @Piedra+@Papel
+            return Papel.new
+        elsif @Piedra+@Papel <= n and n < @Piedra+@Papel+@Tijeras
+            return Tijeras.new
+        elsif @Piedra+@Papel+@Tijeras <= n and n < @Piedra+@Papel+@Tijeras+@Lagarto
+            return Lagarto.new
+        elsif   @Piedra+@Papel+@Tijeras+@Lagarto <= n and n < r
+            return Spock.new
+        end
+    end
+
+    def reset
+        @Papel=0
+        @Tijeras = 0
+        @Piedra = 0
+        @Spock = 0
+        @Lagarto = 0
+    end
 
 end
+
+class Copiar < Estrategia
+    def to_s
+        "Copiar"
+    end
+
+    def prox(j)
+        if j.is_a? Jugada
+            return j
+        else
+            puts "Parametro invalido"
+        end
+    end
+
+    def reset
+        return
+    end
+
+end
+
 
 def hayPosibilidades(probabilidad, actual)
     for x in 0..(probabilidad.length-1)
@@ -216,14 +290,14 @@ end
 
 def fromSymbolToClass(symbol)
     if symbol == :Tijeras
-        return Tijeras
+        return Tijeras.new
     elsif symbol == :Piedra
-        return Piedra
+        return Piedra.new
     elsif symbol == :Lagarto
-        return Lagarto
+        return Lagarto.new
     elsif symbol == :Spock
-        return Spock
+        return Spock.new
     elsif symbol == :Papel 
-        return Papel
+        return Papel.new
     end
 end
