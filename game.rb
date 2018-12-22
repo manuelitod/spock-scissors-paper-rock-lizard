@@ -101,13 +101,6 @@ class Uniforme < Estrategia
     end
 end
 
-class Manual < Estrategia
-
-    def to_s
-        "Manual"
-    end
-end
-
 class Sesgada < Estrategia
 
     attr_accessor :probabilidad, :yaJugadas, :numeroJugadas
