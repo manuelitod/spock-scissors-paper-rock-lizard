@@ -257,6 +257,32 @@ class Copiar < Estrategia
 
 end
 
+class Manual < Estrategia
+
+    @Jugada
+
+    def to_s
+        "Manual"
+    end
+
+    def prox(j)
+        begin
+            puts "Introduce una jugada"
+            STDOUT.flush
+            @Jugada = gets.chomp
+            @Jugada = fromSymbolToClass(@Jugada.to_sym)
+            return @Jugada
+        rescue => exception
+            puts "Jugada inválida"
+            prox(Piedra.new)
+        end
+    end
+
+    def reset
+        return
+    end
+end
+
 
 class Partida
 
@@ -375,5 +401,7 @@ def fromSymbolToClass(symbol)
         return Spock.new
     elsif symbol == :Papel 
         return Papel.new
+    else
+        raise JugadaError, 'Jugada inválida'
     end
 end
