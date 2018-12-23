@@ -1,6 +1,8 @@
+#Clase Jugada que representa una de las cinco formas de jugar
 class Jugada
 
     @pierde = []
+    @imagen = nil
     def puntos(j)
         if j.is_a? Jugada
             if self.class.pierde.include? j.class.name
@@ -15,35 +17,50 @@ class Jugada
         end
     end
 
+
+
     class << self
-        attr_accessor :pierde
+        attr_accessor :pierde, :imagen
     end
 
 end
 
+#Clase piedra que representa la jugada piedra
 class Piedra < Jugada
 
+    attr_accessor :pierde, :imagen
     @pierde = ["Papel", "Spock"]
+    @imagen = "images/papel.png"
+
+
 
     def to_s
-        puts "Piedra"
+        return "Piedra"
     end
 
 end
 
+#Clase papel que representa la jugada papel
 class Papel < Jugada
 
     @pierde = ["Lagarto", "Tijeras"]
+    @imagen = "images/papel.png"
+
+    attr_accessor :pierde, :imagen
 
     def to_s
-        puts "Papel"
+        return "Papel"
     end
 end
 
+#Clase tijeras que representa la jugada Tijeras
 class Tijeras < Jugada
 
-    attr_accessor :pierde
+    attr_accessor :pierde, :imagen
     @pierde = ["Piedra", "Spock"]
+    @imagen = "images/tijeras.png"
+
+
 
     def to_s
         puts "Tijeras"
@@ -54,43 +71,57 @@ class Tijeras < Jugada
     end
 end
 
+#Clase lagarto que representa la jugada lagarto
 class Lagarto < Jugada
-    attr_accessor   :pierde
+
     @pierde = ["Piedra", "Tijeras"]
+    @imagen = "images/lizard.png"
+
+    attr_accessor :pierde, :imagen
 
     def to_s
         puts "Lagarto"
     end
 end
 
+#Clase spock que representa la jugada spock
 class Spock < Jugada
-    attr_accessor :pierde
+
     @pierde = ["Papel", "Lagarto"]
+    @imagen = "images/spock.png"
+
+    attr_accessor :pierde, :imagen
 
     def to_s
         puts "Spock"
     end
 end
 
-
+#Clase estrategia que representa el modo de pensar de la computadora al momento
+#de generar los resultados
 class Estrategia
     
-    def prox(j)
+    @random = Random.new(42)
 
-    end
+    attr_accessor :random
+
 end
 
+# las salidas se hacen de manera uniforme
 class Uniforme < Estrategia
+
+    attr_accessor :random
 
     def initialize(jugadas)
         for x in (0..jugadas.length-1)
             jugadas[x] = fromSymbolToClass(jugadas[x])
         end
         @arreglo = jugadas
+        @random = Random.new(42)
     end
 
     def prox(j)
-        return @arreglo[rand(@arreglo.length)]
+        return @arreglo[@random.rand(@arreglo.length)]
     end
 
     def to_s
@@ -98,12 +129,14 @@ class Uniforme < Estrategia
     end
 
     def reset 
+        @random = Random.new(42)
     end
 end
 
+# LAs salidas se crean de manera sesgada dependiendo de la probabilidad deseada
 class Sesgada < Estrategia
 
-    attr_accessor :probabilidad, :yaJugadas, :numeroJugadas
+    attr_accessor :probabilidad, :yaJugadas, :numeroJugadas, :random
 
     def initialize(hash)
         if hash.class == Hash
@@ -134,23 +167,27 @@ class Sesgada < Estrategia
                 return
             end
 
+            @random = Random.new(42)
             
         else
             puts 'Error: No diccionario pasado como parametro'
         end
     end
 
+    #resetea todo
     def reset
         @yaJugadas = [0] * @arreglo.length
         @jugadas = [0] * @arreglo.length
         @numeroJugadas = 0
+        @random = Random.new(42)
     end
 
+    #Devuelve una jugada
     def prox(j)
-        i = rand(@arreglo.length)
+        i = @random.rand(@arreglo.length)
         #Chequea que la probabilidad sea menor de la ya dada
         while @probabilidad[i] < @yaJugadas[i]
-            puts "next"
+            #puts "next"
             i = (i + 1) % @arreglo.length
         end
 
@@ -164,7 +201,7 @@ class Sesgada < Estrategia
 
         #Chequea que en la proxima iteracion haya al menos una posibilidad
         if !hayPosibilidades(@probabilidad, @yaJugadas) 
-            puts "reset"
+            #puts "reset"
             self.reset
         end
 
@@ -173,6 +210,7 @@ class Sesgada < Estrategia
     end
 
 end
+
 
 class Pensar < Estrategia
     @Papel=0
@@ -231,44 +269,70 @@ class Pensar < Estrategia
 
 end
 
+#Estrategia copiar. Que copia la jugada pasada
 class Copiar < Estrategia
     def to_s
         "Copiar"
     end
 
+    #Creo un booleano que me dice si la primera sucedio o no
+    def initialize
+        @primeraVez = true
+    end
+
+    attr_accessor @primeraVez
+
+    # Da la proxima. la primera vez devuelve piedra
     def prox(j)
-        if j.is_a? Jugada
-            return j
+        if !@primeraVez
+            if j.is_a? Jugada
+                return j
+            else
+                puts "Parametro invalido"
+            end
         else
-            puts "Parametro invalido"
+            @primeraVez = false
+            retrun Piedra.new
         end
     end
 
     def reset
-        return
+        @primeraVez = true
     end
 
 end
 
+
+#Clase manual que solicita una entrada
 class Manual < Estrategia
 
-    @Jugada
+    @guiOn = false
 
     def to_s
         "Manual"
     end
 
     def prox(j)
-        begin
-            puts "Introduce una jugada"
-            STDOUT.flush
-            @Jugada = gets.chomp
-            @Jugada = fromSymbolToClass(@Jugada.to_sym)
-            return @Jugada
-        rescue => exception
-            puts "Jugada inválida"
-            prox(Piedra.new)
+        if !@guiOn
+            begin
+                puts "Introduce una jugada"
+                STDOUT.flush
+                @Jugada = gets.chomp
+                @Jugada = fromSymbolToClass(@Jugada.to_sym)
+                return @Jugada
+            rescue => exception
+                puts "Jugada inválida"
+                prox(Piedra.new)
+            end
+        else
+            if j.is_a? Jugada
+                return j
+            end
         end
+    end
+
+    def turnOnGui
+        @guiOn = true
     end
 
     def reset
@@ -276,14 +340,14 @@ class Manual < Estrategia
     end
 end
 
-
+#Clase partida que representa una partida
 class Partida
 
     attr_accessor :s1, :s2
 
 
     def initialize(hash)
-        raise ArgumentError, 'Argumento tiene mas o menos de dos jugador' unless hash.length==2
+        raise ArgumentError, 'Argumento tiene mas o menos de dos jugadores' unless hash.length==2
 
         hash.values.each do  |jugadores|
             if jugadores.is_a? Estrategia
@@ -304,9 +368,10 @@ class Partida
 
     end
 
+    # dado un entero n, genera n partidas
     def rondas(n)
-        if !(n.is_a? Numeric)
-            raise ArgumentError, "Argumento no es numerico"
+        if !(n.is_a? Integer)
+            raise ArgumentError, "Argumento no es entero"
         end
 
         jugada1 = Piedra.new
@@ -319,11 +384,14 @@ class Partida
             @ganadas1 = @ganadas1 + puntos[0]
             @ganadas2 = @ganadas2 + puntos[1]
         end
+        return
     end
 
+    #Dado un entero n, hace tantas rondas sean necesarias para que algun jugador
+    # gane n veces
     def alcanzar(n)
-        if !(n.is_a? Numeric)
-            raise ArgumentError, "Argumento no es numerico"
+        if !(n.is_a? Integer)
+            raise ArgumentError, "Argumento no es entero"
         end
 
         jugada1 = Piedra.new
@@ -342,14 +410,23 @@ class Partida
 
     end
 
-
+    #Devuelve un mapa con la informacion de la partida
     def info
         hash = { @jugador1 => @ganadas1, @jugador2 => @ganadas2, :Round => @rondas}
         puts "#{hash}"
     end
 
+    def reset
+        @rondas = 0
+        @ganadas1 = 0
+        @ganadas2 = 0
+        @s1.reset
+        @s2.reset
+    end
+
 end
 
+# Funcion que chequea que al menos un elementos del primer arreglo es mayor al segundo
 def hayPosibilidades(probabilidad, actual)
     for x in 0..(probabilidad.length-1)
         if probabilidad[x] > actual[x]
@@ -359,6 +436,7 @@ def hayPosibilidades(probabilidad, actual)
     return false
 end
 
+#Funcion que suma una arreglo de enteros
 def sumarArreglo(arreglo)
     x = 0
     arreglo.each do |y|
@@ -371,6 +449,8 @@ def sumarArreglo(arreglo)
     return x
 end
 
+#Funcion que dado un numero y un arreglo de numero, devuelve un arreglo 
+# del mismo tamano con arreglo(i)/suma en cada posicion
 def crearProbabilidad(suma, arreglo)
     flotante = suma.to_f
     arreglo_aux = [0] * arreglo.length
@@ -382,7 +462,7 @@ def crearProbabilidad(suma, arreglo)
 end
 
 
-
+#Dado un simbolo devuelve una instancia
 def fromSymbolToClass(symbol)
     if symbol == :Tijeras
         return Tijeras.new
@@ -398,3 +478,4 @@ def fromSymbolToClass(symbol)
         raise JugadaError, 'Jugada inválida'
     end
 end
+
