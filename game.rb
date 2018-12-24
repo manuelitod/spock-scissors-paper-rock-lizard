@@ -1,9 +1,11 @@
-#Clase Jugada que representa una de las cinco formas de jugar
+## 
+# Clase Jugada que representa una de las cinco formas de jugar
 class Jugada
 
     @pierde = [] # Jugada no pierde contra nadie
     @imagen = nil # Imagen que representa a la clase
-    
+  
+    ##
     # Metodo para saber quien gana una ronda
     def puntos(j)
         if j.is_a? Jugada
@@ -20,21 +22,23 @@ class Jugada
     end
 
 
+    ##
     # Class tiene prioridad sobre self
     class << self
         attr_accessor :pierde, :imagen
     end
 
 end
-
-#Clase piedra que representa la jugada piedra
+##
+# Clase piedra que representa la jugada piedra
 class Piedra < Jugada
-
+    ##
     # Atributos pierde e imagen
     attr_accessor :pierde, :imagen
     @pierde = ["Papel", "Spock"]
     @imagen = "images/papel.png"
 
+    ##
     # Devuelve el string de la clase Piedra
     def to_s
         return "Piedra"
@@ -42,9 +46,10 @@ class Piedra < Jugada
 
 end
 
-#Clase papel que representa la jugada papel
+##
+# Clase papel que representa la jugada papel
 class Papel < Jugada
-
+    ##
     # Atributos pierde e imagen
     @pierde = ["Lagarto", "Tijeras"]
     @imagen = "images/papel.png"
@@ -57,42 +62,49 @@ class Papel < Jugada
     end
 end
 
-#Clase tijeras que representa la jugada Tijeras
+##
+# Clase tijeras que representa la jugada Tijeras
 class Tijeras < Jugada
 
+    ##
     # Atributos pierde e imagen
     attr_accessor :pierde, :imagen
     @pierde = ["Piedra", "Spock"]
     @imagen = "images/tijeras.png"
 
-
+    ##
     # Devuelve el string de la clase Tijeras
     def to_s
         puts "Tijeras"
     end
 
+    ##
     # Get del atributo pierde
     def pierde
         @pierde
     end
 end
 
-#Clase lagarto que representa la jugada lagarto
+##
+# Clase lagarto que representa la jugada lagarto
 class Lagarto < Jugada
 
+    ##
     # Atributos pierde e imagen
     @pierde = ["Piedra", "Tijeras"]
     @imagen = "images/lizard.png"
 
     attr_accessor :pierde, :imagen
 
+    ##
     # Devuelve el string de la clase Lagarto
     def to_s
         puts "Lagarto"
     end
 end
 
-#Clase spock que representa la jugada spock
+##
+# Clase spock que representa la jugada spock
 class Spock < Jugada
 
     # Atributos pierde e imagen
@@ -101,14 +113,16 @@ class Spock < Jugada
 
     attr_accessor :pierde, :imagen
 
+    ##
     # Devuelve el string de la clase Spock
     def to_s
         puts "Spock"
     end
 end
 
-#Clase estrategia que representa el modo de pensar de la computadora al momento
-#de generar los resultados
+##
+# Clase estrategia que representa el modo de pensar de la computadora al momento
+# de generar los resultados
 class Estrategia
     
     # Random de la estrategia. Semilla 42
@@ -118,12 +132,14 @@ class Estrategia
 
 end
 
-# las salidas se hacen de manera uniforme
+##
+#  EStrategia: las salidas se hacen de manera uniforme
 class Uniforme < Estrategia
 
     # Random de la estrategia
     attr_accessor :random
 
+    ##
     # Metodo para inicializar la clase uniforme. Recibe un arreglo de jugadas
     def initialize(jugadas)
         for x in (0..jugadas.length-1)
@@ -133,28 +149,33 @@ class Uniforme < Estrategia
         @random = Random.new(42)
     end
 
+    ##
     # Proxima jugada a realizar
     def prox(j)
         return @arreglo[@random.rand(@arreglo.length)]
     end
 
+    ##
     # String de la clase
     def to_s
         "Uniforme con : #{@arreglo}"   
     end
 
+    ##
     # Resetear la estrategia
     def reset 
         @random = Random.new(42)
     end
 end
 
-# LAs salidas se crean de manera sesgada dependiendo de la probabilidad deseada
+##
+# Estrategia :LAs salidas se crean de manera sesgada dependiendo de la probabilidad deseada
 class Sesgada < Estrategia
 
     # Atributos para realizar la probabilidad y llevar estadisticas
     attr_accessor :probabilidad, :yaJugadas, :numeroJugadas, :random
 
+    ##
     # Inicializar la clase
     def initialize(hash)
         if hash.class == Hash
@@ -192,7 +213,8 @@ class Sesgada < Estrategia
         end
     end
 
-    #resetea todo
+    ##
+    # resetea todo la estrategia a su estado inicial
     def reset
         @yaJugadas = [0] * @arreglo.length
         @jugadas = [0] * @arreglo.length
@@ -200,7 +222,8 @@ class Sesgada < Estrategia
         @random = Random.new(42)
     end
 
-    #Devuelve una jugada
+    ##
+    # Devuelve una jugada
     def prox(j)
         i = @random.rand(@arreglo.length)
         #Chequea que la probabilidad sea menor de la ya dada
@@ -216,8 +239,8 @@ class Sesgada < Estrategia
         @yaJugadas = crearProbabilidad(@numeroJugadas, @jugadas)
 
 
-
-        #Chequea que en la proxima iteracion haya al menos una posibilidad
+ 
+        # Chequea que en la proxima iteracion haya al menos una posibilidad
         if !hayPosibilidades(@probabilidad, @yaJugadas) 
             #puts "reset"
             self.reset
@@ -229,7 +252,9 @@ class Sesgada < Estrategia
 
 end
 
-
+##
+# Estrategia Pensar que piensa en las ultimas jugadas y devuelve algo dependiendo
+# del rango
 class Pensar < Estrategia
     # Atributo para llevar las cuentas de las jugadas
     @Papel=0
@@ -238,11 +263,13 @@ class Pensar < Estrategia
     @Spock = 0
     @Lagarto = 0
 
+    ##
     # String de la clase
     def to_s
         "Pensar"
     end
 
+    ##
     # Proxima jugada
     def prox(m)
         if m.is_a? Jugada
@@ -279,6 +306,7 @@ class Pensar < Estrategia
         end
     end
 
+    ##
     # Reset de las cuentas de jugadas realizadas
     def reset
         @Papel=0
@@ -290,21 +318,25 @@ class Pensar < Estrategia
 
 end
 
-#Estrategia copiar. Que copia la jugada pasada
+##
+# Estrategia copiar. Que copia la jugada pasada
 class Copiar < Estrategia
 
+    ##
     # String de la clase
     def to_s
         "Copiar"
     end
 
-    #Creo un booleano que me dice si la primera sucedio o no
+    ##
+    # Creo un booleano que me dice si la primera sucedio o no
     def initialize
         @primeraVez = true
     end
 
     attr_accessor :primeraVez
 
+    ##
     # Da la proxima. la primera vez devuelve piedra
     def prox(j)
         if !@primeraVez
@@ -319,23 +351,27 @@ class Copiar < Estrategia
         end
     end
 
+    ##
+    # reset : devuelve la estrategia a su estado inicial
     def reset
         @primeraVez = true
     end
 
 end
 
-
-#Clase manual que solicita una entrada
+##
+# Clase manual que solicita una entrada
 class Manual < Estrategia
 
     @guiOn = false
 
+    ##
     # String de la clase
     def to_s
         "Manual"
     end
 
+    ##
     # Metodo para realizar la siguiente jugada
     def prox(j)
         if !@guiOn
@@ -356,22 +392,27 @@ class Manual < Estrategia
         end
     end
 
+    ##
+    # turnOnGui: Prende el true de la interfaz
     def turnOnGui
         @guiOn = true
     end
 
+    ##
     # Metodo reset por default para no generar errores
     def reset
         return
     end
 end
 
-#Clase partida que representa una partida
+##
+# Clase partida que representa una partida
 class Partida
 
     # Estrategias de los jugadores
     attr_accessor :s1, :s2
 
+    ##
     # Inicia una nueva partida
     def initialize(hash)
         raise ArgumentError, 'Argumento tiene mas o menos de dos jugadores' unless hash.length==2
@@ -395,7 +436,8 @@ class Partida
 
     end
 
-    # dado un entero n, genera n partidas
+    ##
+    # rondas: dado un entero n, genera n partidas
     def rondas(n)
         if !(n.is_a? Integer)
             raise ArgumentError, "Argumento no es entero"
@@ -414,7 +456,8 @@ class Partida
         return
     end
 
-    #Dado un entero n, hace tantas rondas sean necesarias para que algun jugador
+    ##
+    # alcanzar(n): Dado un entero n, hace tantas rondas sean necesarias para que algun jugador
     # gane n veces
     def alcanzar(n)
         if !(n.is_a? Integer)
@@ -432,18 +475,20 @@ class Partida
             @ganadas2 = @ganadas2 + puntos[1]
         end
 
-        self.info
+        return self.info
 
 
     end
 
-    #Devuelve un mapa con la informacion de la partida
+    ##
+    # info : Devuelve un mapa con la informacion de la partida
     def info
         hash = { @jugador1 => @ganadas1, @jugador2 => @ganadas2, :Round => @rondas}
-        puts "#{hash}"
+        return hash
     end
 
-    # Reset de la partida
+    ##
+    # reset : Reset de la partida
     def reset
         @rondas = 0
         @ganadas1 = 0
@@ -454,6 +499,7 @@ class Partida
 
 end
 
+##
 # Funcion que chequea que al menos un elementos del primer arreglo es mayor al segundo
 def hayPosibilidades(probabilidad, actual)
     for x in 0..(probabilidad.length-1)
@@ -464,6 +510,7 @@ def hayPosibilidades(probabilidad, actual)
     return false
 end
 
+##
 #Funcion que suma una arreglo de enteros
 def sumarArreglo(arreglo)
     x = 0
@@ -476,8 +523,8 @@ def sumarArreglo(arreglo)
     end
     return x
 end
-
-#Funcion que dado un numero y un arreglo de numero, devuelve un arreglo 
+##
+# Funcion que dado un numero y un arreglo de numero, devuelve un arreglo 
 # del mismo tamano con arreglo(i)/suma en cada posicion
 def crearProbabilidad(suma, arreglo)
     flotante = suma.to_f
@@ -489,8 +536,8 @@ def crearProbabilidad(suma, arreglo)
     return arreglo_aux
 end
 
-
-#Dado un simbolo devuelve una instancia
+##
+# Dado un simbolo devuelve una instancia
 def fromSymbolToClass(symbol)
     if symbol == :Tijeras
         return Tijeras.new
