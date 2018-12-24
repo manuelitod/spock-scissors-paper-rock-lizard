@@ -280,7 +280,7 @@ class Copiar < Estrategia
         @primeraVez = true
     end
 
-    attr_accessor @primeraVez
+    attr_accessor :primeraVez
 
     # Da la proxima. la primera vez devuelve piedra
     def prox(j)
@@ -292,7 +292,7 @@ class Copiar < Estrategia
             end
         else
             @primeraVez = false
-            retrun Piedra.new
+            return Piedra.new
         end
     end
 
