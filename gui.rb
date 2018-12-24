@@ -1,4 +1,4 @@
-Shoes.app  :width => 490, :height => 280, :title => "Piedra" do
+Shoes.app  :width => 490, :height => 280, :title => "Estoy en la Piedra" do
     require_relative 'game'
     background "#DFA"
 
